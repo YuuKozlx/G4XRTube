@@ -1,0 +1,39 @@
+# Build directories
+/build/
+/cmake-build-*/
+
+# CMake-generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Simulation output
+*.root
+*.csv
+*.xml
+*.hdf5
+*.log
+*.out
+*.err
+
+# Generated plots
+spectrum.pdf
+spatial_maps.pdf
+spatial_profiles.pdf
+
+# Geant4 visualization output
+*.prim
+*.wrl
+*.heprep
+*.eps
+.DAWN_*
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Editors and operating systems
+.DS_Store
+*~
+*.swp

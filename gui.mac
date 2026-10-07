@@ -1,0 +1,16 @@
+# Menu entries for the Geant4 Qt interactive session.
+/gui/addMenu file File
+/gui/addButton file Quit exit
+
+/gui/addMenu run Run
+/gui/addButton run "Run L-55" "/control/execute L55.mac"
+/gui/addButton run "Run H-100" "/control/execute H100.mac"
+/gui/addButton run "Run N-100" "/control/execute N100.mac"
+/gui/addButton run "Run W-150" "/control/execute W150.mac"
+
+/gui/addMenu viewer Viewer
+/gui/addButton viewer "Surface" "/vis/viewer/set/style surface"
+/gui/addButton viewer "Wireframe" "/vis/viewer/set/style wireframe"
+/gui/addButton viewer "Refresh" "/vis/viewer/refresh"
+
+/run/printProgress 1000000

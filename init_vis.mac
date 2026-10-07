@@ -1,0 +1,7 @@
+# Interactive initialization for G4XRTube.
+/control/verbose 1
+/control/saveHistory
+/run/verbose 1
+/run/initialize
+/control/execute vis.mac
+/control/execute gui.mac

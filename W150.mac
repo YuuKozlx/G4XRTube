@@ -1,0 +1,38 @@
+# W-150 example configuration (150 kV)
+
+#/run/numberOfThreads 4
+
+# Geometry
+/XRtube/det/setTargetMaterial G4_W
+/XRtube/det/setAnodeAngle 15 deg
+
+# Inherent filtration
+/XRtube/det/setInherentFilterMaterial G4_Al
+/XRtube/det/setInherentFilterThickness 4 mm
+
+# Additional filtration
+/XRtube/det/setFilterMaterial G4_Sn
+/XRtube/det/setFilterThickness 1.0 mm
+
+# Electromagnetic physics and production cut
+/phys/SelectPhysicsList standard_option4
+/phys/setCuts 5 um
+
+# Build the geometry, physics, and user actions
+/run/initialize
+
+# Bremsstrahlung splitting
+/process/em/setSecBiasing eBrem world 200 1000 keV
+
+# Run control
+/control/verbose 1
+/run/verbose 1
+
+# Incident electron energy
+/xraytube/setEnergy 150 keV
+
+# Apply the updated run configuration
+/run/initialize
+
+# Number of primary electrons (unchanged from the study configuration)
+/run/beamOn 100000000
