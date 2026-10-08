@@ -6,14 +6,20 @@
 
 #include "G4VUserActionInitialization.hh"
 
+class DetectorConstruction;
+
 class ActionInitialization final : public G4VUserActionInitialization
 {
 public:
-  ActionInitialization() = default;
+  explicit ActionInitialization(const DetectorConstruction* detector)
+    : fDetector(detector) {}
   ~ActionInitialization() override = default;
 
   void BuildForMaster() const override;
   void Build() const override;
+
+private:
+  const DetectorConstruction* fDetector;
 };
 
 #endif

@@ -34,7 +34,6 @@ set(G4XRTUBE_RUNTIME_FILES
   gui.mac
   init_vis.mac
   vis.mac
-  plot.C
   geant4_gui_launcher.py
 )
 

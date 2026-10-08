@@ -3,7 +3,8 @@
 
 #include "SensitiveDetector.hh"
 
-#include "G4AnalysisManager.hh"
+#include "SpectrumRun.hh"
+#include "G4RunManager.hh"
 #include "G4Step.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -23,27 +24,16 @@ G4bool SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory*)
 
   const auto* preStep = step->GetPreStepPoint();
   const G4double energy = preStep->GetKineticEnergy();
-  const G4double energyKeV = energy / keV;
   const G4double weight = preStep->GetWeight();
   const auto& position = preStep->GetPosition();
   const G4double x = position.x();
   const G4double y = position.y();
 
-  auto* analysis = G4AnalysisManager::Instance();
-
-  // The spectrum histogram declares keV as its unit, so it receives the
-  // Geant4 internal energy value. The ntuple stores an explicit keV value.
-  analysis->FillH1(0, energy, weight);
-  analysis->FillH2(0, x, y, weight);
-  analysis->FillH1(1, x, weight);
-  analysis->FillH1(2, y, weight);
-  analysis->FillH2(1, x, y, energyKeV * weight);
-
-  analysis->FillNtupleDColumn(0, 0, energyKeV);
-  analysis->FillNtupleDColumn(0, 1, x / mm);
-  analysis->FillNtupleDColumn(0, 2, y / mm);
-  analysis->FillNtupleDColumn(0, 3, weight);
-  analysis->AddNtupleRow(0);
+  auto* run = static_cast<SpectrumRun*>(
+      G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  if (run) {
+    run->RecordPhoton(energy, x, y, weight);
+  }
 
   return true;
 }

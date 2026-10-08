@@ -6,8 +6,8 @@
 /XRtube/det/setTargetMaterial G4_W
 /XRtube/det/setAnodeAngle 15 deg
 /XRtube/det/setScoringDistance 50 cm
-/XRtube/det/setScoringOffsetX 0 cm
-/XRtube/det/setScoringOffsetY 0 cm
+/XRtube/det/clearScoringOffsets
+/XRtube/det/addScoringOffset 0 0 cm
 
 # No inherent or added filtration
 /XRtube/det/setInherentFilterMaterial G4_Galactic

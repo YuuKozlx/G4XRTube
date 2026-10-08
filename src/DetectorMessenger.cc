@@ -4,6 +4,11 @@
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
+#include "G4UIcmdWithoutParameter.hh"
+#include "G4UIcommand.hh"
+#include "G4UIparameter.hh"
+
+#include <sstream>
 
 DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   : G4UImessenger(),
@@ -18,7 +23,9 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
     fInherentFilterThicknessCmd(nullptr),
     fScoringDistanceCmd(nullptr),
     fScoringOffsetXCmd(nullptr),
-    fScoringOffsetYCmd(nullptr)
+    fScoringOffsetYCmd(nullptr),
+    fClearScoringOffsetsCmd(nullptr),
+    fAddScoringOffsetCmd(nullptr)
 {
   fXRayTubeDir = new G4UIdirectory("/XRtube/");
   fXRayTubeDir->SetGuidance("G4XRTube geometry controls.");
@@ -91,6 +98,20 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   fScoringOffsetYCmd->SetDefaultUnit("cm");
   fScoringOffsetYCmd->SetParameterName("ScoringOffsetY", false);
   fScoringOffsetYCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  fClearScoringOffsetsCmd = new G4UIcmdWithoutParameter(
+      "/XRtube/det/clearScoringOffsets", this);
+  fClearScoringOffsetsCmd->SetGuidance("Clear all scoring offsets.");
+  fClearScoringOffsetsCmd->AvailableForStates(G4State_PreInit);
+
+  fAddScoringOffsetCmd = new G4UIcommand(
+      "/XRtube/det/addScoringOffset", this);
+  fAddScoringOffsetCmd->SetGuidance(
+      "Add a scoring offset: x y unit (for example, 2 -1 cm).");
+  fAddScoringOffsetCmd->SetParameter(new G4UIparameter("x", 'd', false));
+  fAddScoringOffsetCmd->SetParameter(new G4UIparameter("y", 'd', false));
+  fAddScoringOffsetCmd->SetParameter(new G4UIparameter("unit", 's', false));
+  fAddScoringOffsetCmd->AvailableForStates(G4State_PreInit);
 }
 
 DetectorMessenger::~DetectorMessenger()
@@ -104,6 +125,8 @@ DetectorMessenger::~DetectorMessenger()
   delete fScoringDistanceCmd;
   delete fScoringOffsetXCmd;
   delete fScoringOffsetYCmd;
+  delete fClearScoringOffsetsCmd;
+  delete fAddScoringOffsetCmd;
   delete fDetDir;
   delete fXRayTubeDir;
 }
@@ -137,5 +160,17 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   }
   else if (command == fScoringOffsetYCmd) {
     fDetector->SetScoringOffsetY(fScoringOffsetYCmd->GetNewDoubleValue(newValue));
+  }
+  else if (command == fClearScoringOffsetsCmd) {
+    fDetector->ClearScoringOffsets();
+  }
+  else if (command == fAddScoringOffsetCmd) {
+    std::istringstream input(newValue);
+    G4double x = 0.0;
+    G4double y = 0.0;
+    G4String unit;
+    input >> x >> y >> unit;
+    const G4double scale = G4UIcommand::ValueOf(unit);
+    fDetector->AddScoringOffset(x * scale, y * scale);
   }
 }

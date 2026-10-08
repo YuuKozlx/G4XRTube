@@ -8,12 +8,12 @@
 
 void ActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new RunAction());
+  SetUserAction(new RunAction(fDetector));
 }
 
 void ActionInitialization::Build() const
 {
   SetUserAction(new PrimaryGeneratorAction());
-  SetUserAction(new RunAction());
+  SetUserAction(new RunAction(fDetector));
   SetUserAction(new EventAction());
 }

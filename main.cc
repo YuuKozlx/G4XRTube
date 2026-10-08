@@ -28,9 +28,10 @@ int main(int argc, char** argv)
   G4Random::setTheSeed(static_cast<long>(std::time(nullptr)));
 
   auto* runManager = G4RunManagerFactory::CreateRunManager();
-  runManager->SetUserInitialization(new DetectorConstruction());
+  auto* detector = new DetectorConstruction();
+  runManager->SetUserInitialization(detector);
   runManager->SetUserInitialization(new PhysicsList());
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization(detector));
 
   auto* uiManager = G4UImanager::GetUIpointer();
   G4VisManager* visManager = nullptr;

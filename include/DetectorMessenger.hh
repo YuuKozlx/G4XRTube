@@ -40,6 +40,8 @@ class DetectorConstruction;
 class G4UIdirectory;
 class G4UIcmdWithAString;
 class G4UIcmdWithADoubleAndUnit;
+class G4UIcmdWithoutParameter;
+class G4UIcommand;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -65,6 +67,8 @@ private:
   G4UIcmdWithADoubleAndUnit *fScoringDistanceCmd;
   G4UIcmdWithADoubleAndUnit *fScoringOffsetXCmd;
   G4UIcmdWithADoubleAndUnit *fScoringOffsetYCmd;
+  G4UIcmdWithoutParameter *fClearScoringOffsetsCmd;
+  G4UIcommand *fAddScoringOffsetCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

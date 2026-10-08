@@ -30,8 +30,7 @@ DetectorConstruction::DetectorConstruction()
     fFilterThickness(0.8 * mm),
     fInherentFilterThickness(1.0 * mm),
     fScoringDistance(50.0 * cm),
-    fScoringOffsetX(0.0 * cm),
-    fScoringOffsetY(0.0 * cm),
+    fScoringPositions({{0.0 * mm, 0.0 * mm}}),
     fInherentFilterMaterial(nullptr),
     fAnodeMaterial(nullptr),
     fFilterMaterial(nullptr),
@@ -80,11 +79,16 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   G4LogicalVolumeStore::GetInstance()->Clean();
   G4SolidStore::GetInstance()->Clean();
 
+  G4double maximumOffset = 0.0;
+  for (const auto& position : fScoringPositions) {
+    maximumOffset = std::max(maximumOffset, std::hypot(position.x, position.y));
+  }
+  const G4double scoringRadius = 120.0 * mm;
+  const G4double detectorRadius = maximumOffset + scoringRadius;
   const G4double worldSizeXYZ = std::max({
       500.0 * cm,
       2.0 * (fScoringDistance + 1.0 * cm),
-      2.0 * (std::abs(fScoringOffsetX) + 13.0 * cm),
-      2.0 * (std::abs(fScoringOffsetY) + 13.0 * cm)});
+      2.0 * (detectorRadius + 1.0 * cm)});
 
   auto* solidWorld = new G4Box("World",
                                worldSizeXYZ / 2.0,
@@ -179,7 +183,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   // Detector scoring plane
   auto* solidDetector = new G4Tubs("detector",
                                    0.0 * mm,
-                                   120.0 * mm,
+                                   detectorRadius,
                                    0.5 * mm,
                                    0.0 * deg,
                                    360.0 * deg);
@@ -187,9 +191,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   detectorLV = new G4LogicalVolume(solidDetector, vacuum, "detector");
 
   new G4PVPlacement(nullptr,
-                    G4ThreeVector(fScoringOffsetX,
-                                  fScoringOffsetY,
-                                  -fScoringDistance),
+                    G4ThreeVector(0., 0., -fScoringDistance),
                     detectorLV,
                     "detector",
                     worldLV,
@@ -197,10 +199,9 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
                     0,
                     fCheckOverlaps);
 
-  G4cout << "Scoring plane center: ("
-         << G4BestUnit(fScoringOffsetX, "Length") << ", "
-         << G4BestUnit(fScoringOffsetY, "Length") << ", -"
-         << G4BestUnit(fScoringDistance, "Length") << ")" << G4endl;
+  G4cout << "Scoring plane distance: "
+         << G4BestUnit(fScoringDistance, "Length")
+         << ", scoring positions: " << fScoringPositions.size() << G4endl;
 
   auto* blue = new G4VisAttributes(G4Colour(0., 0., 1., 0.1));
   blue->SetVisibility(true);
@@ -300,14 +301,34 @@ void DetectorConstruction::SetScoringDistance(G4double value)
 
 void DetectorConstruction::SetScoringOffsetX(G4double value)
 {
-  fScoringOffsetX = value;
+  if (fScoringPositions.empty()) {
+    fScoringPositions.push_back({value, 0.0});
+  }
+  else {
+    fScoringPositions.front().x = value;
+  }
   G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
 void DetectorConstruction::SetScoringOffsetY(G4double value)
 {
-  fScoringOffsetY = value;
+  if (fScoringPositions.empty()) {
+    fScoringPositions.push_back({0.0, value});
+  }
+  else {
+    fScoringPositions.front().y = value;
+  }
   G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+void DetectorConstruction::ClearScoringOffsets()
+{
+  fScoringPositions.clear();
+}
+
+void DetectorConstruction::AddScoringOffset(G4double x, G4double y)
+{
+  fScoringPositions.push_back({x, y});
 }
 
 G4Material* DetectorConstruction::GetFilterMaterial() const
@@ -347,18 +368,28 @@ G4double DetectorConstruction::GetScoringDistance() const
 
 G4double DetectorConstruction::GetScoringOffsetX() const
 {
-  return fScoringOffsetX;
+  return fScoringPositions.empty() ? 0.0 : fScoringPositions.front().x;
 }
 
 G4double DetectorConstruction::GetScoringOffsetY() const
 {
-  return fScoringOffsetY;
+  return fScoringPositions.empty() ? 0.0 : fScoringPositions.front().y;
+}
+
+const std::vector<ScoringPosition>& DetectorConstruction::GetScoringPositions() const
+{
+  return fScoringPositions;
 }
 
 void DetectorConstruction::ConstructSDandField()
 {
-  auto* sd = new SensitiveDetector("DetectorSD");
-  G4SDManager::GetSDMpointer()->AddNewDetector(sd);
+  auto* manager = G4SDManager::GetSDMpointer();
+  auto* sd = dynamic_cast<SensitiveDetector*>(
+      manager->FindSensitiveDetector("DetectorSD", false));
+  if (!sd) {
+    sd = new SensitiveDetector("DetectorSD");
+    manager->AddNewDetector(sd);
+  }
 
   if (detectorLV) {
     detectorLV->SetSensitiveDetector(sd);

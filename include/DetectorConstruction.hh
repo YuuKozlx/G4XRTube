@@ -4,6 +4,9 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
 #include "G4Material.hh"
+#include "ScoringPosition.hh"
+
+#include <vector>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -27,6 +30,8 @@ public:
   void SetScoringDistance(G4double value);
   void SetScoringOffsetX(G4double value);
   void SetScoringOffsetY(G4double value);
+  void ClearScoringOffsets();
+  void AddScoringOffset(G4double x, G4double y);
 
   G4Material* GetFilterMaterial() const;
   G4Material* GetTargetMaterial() const;
@@ -37,6 +42,7 @@ public:
   G4double GetScoringDistance() const;
   G4double GetScoringOffsetX() const;
   G4double GetScoringOffsetY() const;
+  const std::vector<ScoringPosition>& GetScoringPositions() const;
 
 private:
   void DefineMaterials();
@@ -49,8 +55,7 @@ private:
   G4double fFilterThickness;
   G4double fInherentFilterThickness;
   G4double fScoringDistance;
-  G4double fScoringOffsetX;
-  G4double fScoringOffsetY;
+  std::vector<ScoringPosition> fScoringPositions;
 
   G4Material* fInherentFilterMaterial;
   G4Material* fAnodeMaterial;
