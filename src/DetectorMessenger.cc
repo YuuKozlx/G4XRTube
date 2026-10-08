@@ -15,7 +15,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
     fAnodeAngleCmd(nullptr),
     fFilterThicknessCmd(nullptr),
     fInherentFilterMatCmd(nullptr),
-    fInherentFilterThicknessCmd(nullptr)
+    fInherentFilterThicknessCmd(nullptr),
+    fScoringDistanceCmd(nullptr),
+    fScoringOffsetXCmd(nullptr),
+    fScoringOffsetYCmd(nullptr)
 {
   fXRayTubeDir = new G4UIdirectory("/XRtube/");
   fXRayTubeDir->SetGuidance("G4XRTube geometry controls.");
@@ -63,6 +66,31 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   fInherentFilterThicknessCmd->SetParameterName("InherentFilterThickness", false);
   fInherentFilterThicknessCmd->SetRange("InherentFilterThickness>0.");
   fInherentFilterThicknessCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  fScoringDistanceCmd =
+      new G4UIcmdWithADoubleAndUnit("/XRtube/det/setScoringDistance", this);
+  fScoringDistanceCmd->SetGuidance("Set target-to-scoring-plane distance.");
+  fScoringDistanceCmd->SetUnitCategory("Length");
+  fScoringDistanceCmd->SetDefaultUnit("cm");
+  fScoringDistanceCmd->SetParameterName("ScoringDistance", false);
+  fScoringDistanceCmd->SetRange("ScoringDistance>0.");
+  fScoringDistanceCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  fScoringOffsetXCmd =
+      new G4UIcmdWithADoubleAndUnit("/XRtube/det/setScoringOffsetX", this);
+  fScoringOffsetXCmd->SetGuidance("Set scoring-plane center X offset.");
+  fScoringOffsetXCmd->SetUnitCategory("Length");
+  fScoringOffsetXCmd->SetDefaultUnit("cm");
+  fScoringOffsetXCmd->SetParameterName("ScoringOffsetX", false);
+  fScoringOffsetXCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  fScoringOffsetYCmd =
+      new G4UIcmdWithADoubleAndUnit("/XRtube/det/setScoringOffsetY", this);
+  fScoringOffsetYCmd->SetGuidance("Set scoring-plane center Y offset.");
+  fScoringOffsetYCmd->SetUnitCategory("Length");
+  fScoringOffsetYCmd->SetDefaultUnit("cm");
+  fScoringOffsetYCmd->SetParameterName("ScoringOffsetY", false);
+  fScoringOffsetYCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 DetectorMessenger::~DetectorMessenger()
@@ -73,6 +101,9 @@ DetectorMessenger::~DetectorMessenger()
   delete fFilterThicknessCmd;
   delete fInherentFilterMatCmd;
   delete fInherentFilterThicknessCmd;
+  delete fScoringDistanceCmd;
+  delete fScoringOffsetXCmd;
+  delete fScoringOffsetYCmd;
   delete fDetDir;
   delete fXRayTubeDir;
 }
@@ -97,5 +128,14 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   else if (command == fInherentFilterThicknessCmd) {
     fDetector->SetInherentFilterThickness(
         fInherentFilterThicknessCmd->GetNewDoubleValue(newValue));
+  }
+  else if (command == fScoringDistanceCmd) {
+    fDetector->SetScoringDistance(fScoringDistanceCmd->GetNewDoubleValue(newValue));
+  }
+  else if (command == fScoringOffsetXCmd) {
+    fDetector->SetScoringOffsetX(fScoringOffsetXCmd->GetNewDoubleValue(newValue));
+  }
+  else if (command == fScoringOffsetYCmd) {
+    fDetector->SetScoringOffsetY(fScoringOffsetYCmd->GetNewDoubleValue(newValue));
   }
 }

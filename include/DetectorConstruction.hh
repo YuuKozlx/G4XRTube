@@ -24,6 +24,9 @@ public:
   void SetFilterThickness(G4double value);
   void SetInherentFilterMaterial(G4String);
   void SetInherentFilterThickness(G4double value);
+  void SetScoringDistance(G4double value);
+  void SetScoringOffsetX(G4double value);
+  void SetScoringOffsetY(G4double value);
 
   G4Material* GetFilterMaterial() const;
   G4Material* GetTargetMaterial() const;
@@ -31,6 +34,9 @@ public:
   G4double GetFilterThickness() const;
   G4Material* GetInherentFilterMaterial() const;
   G4double GetInherentFilterThickness() const;
+  G4double GetScoringDistance() const;
+  G4double GetScoringOffsetX() const;
+  G4double GetScoringOffsetY() const;
 
 private:
   void DefineMaterials();
@@ -42,6 +48,9 @@ private:
   G4double fAnodeAngle;
   G4double fFilterThickness;
   G4double fInherentFilterThickness;
+  G4double fScoringDistance;
+  G4double fScoringOffsetX;
+  G4double fScoringOffsetY;
 
   G4Material* fInherentFilterMaterial;
   G4Material* fAnodeMaterial;

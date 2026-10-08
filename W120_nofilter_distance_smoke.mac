@@ -1,0 +1,19 @@
+# Short validation run for the configurable scoring distance.
+/run/numberOfThreads 8
+/XRtube/det/setTargetMaterial G4_W
+/XRtube/det/setAnodeAngle 15 deg
+/XRtube/det/setScoringDistance 100 cm
+/XRtube/det/setScoringOffsetX 2 cm
+/XRtube/det/setScoringOffsetY -1 cm
+/XRtube/det/setInherentFilterMaterial G4_Galactic
+/XRtube/det/setInherentFilterThickness 1 um
+/XRtube/det/setFilterMaterial G4_Galactic
+/XRtube/det/setFilterThickness 1 um
+/phys/SelectPhysicsList standard_option4
+/phys/setCuts 5. um
+/run/initialize
+/process/em/setSecBiasing eBrem world 200 1000 keV
+/xraytube/setEnergy 120 keV
+/run/initialize
+/random/setSeeds 1201201 7654321
+/run/beamOn 10000

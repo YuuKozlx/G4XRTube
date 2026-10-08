@@ -34,11 +34,19 @@
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithABool.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PhysicsListMessenger::PhysicsListMessenger(PhysicsList *pPhys) : G4UImessenger(),
-                                                                 fPhysicsList(pPhys)
+                                                                 fPhysicsList(pPhys),
+                                                                 fPhysDir(nullptr),
+                                                                 fCutsCmd(nullptr),
+                                                                 fListCmd(nullptr),
+                                                                 fPixeCmd(nullptr),
+                                                                 fFluorescenceCmd(nullptr),
+                                                                 fAugerCmd(nullptr),
+                                                                 fAugerCascadeCmd(nullptr)
 {
   fPhysDir = new G4UIdirectory("/phys/");
   fPhysDir->SetGuidance("PhysicsList control");
@@ -55,6 +63,26 @@ PhysicsListMessenger::PhysicsListMessenger(PhysicsList *pPhys) : G4UImessenger()
   fListCmd->SetParameterName("PList", false);
   fListCmd->AvailableForStates(G4State_PreInit);
 
+  fPixeCmd = new G4UIcmdWithABool("/phys/setPIXE", this);
+  fPixeCmd->SetGuidance("Enable or disable PIXE atomic de-excitation.");
+  fPixeCmd->SetParameterName("PIXE", false);
+  fPixeCmd->AvailableForStates(G4State_PreInit);
+
+  fFluorescenceCmd = new G4UIcmdWithABool("/phys/setFluorescence", this);
+  fFluorescenceCmd->SetGuidance("Enable or disable fluorescence photons.");
+  fFluorescenceCmd->SetParameterName("Fluorescence", false);
+  fFluorescenceCmd->AvailableForStates(G4State_PreInit);
+
+  fAugerCmd = new G4UIcmdWithABool("/phys/setAuger", this);
+  fAugerCmd->SetGuidance("Enable or disable Auger electrons.");
+  fAugerCmd->SetParameterName("Auger", false);
+  fAugerCmd->AvailableForStates(G4State_PreInit);
+
+  fAugerCascadeCmd = new G4UIcmdWithABool("/phys/setAugerCascade", this);
+  fAugerCascadeCmd->SetGuidance("Enable or disable Auger cascade.");
+  fAugerCascadeCmd->SetParameterName("AugerCascade", false);
+  fAugerCascadeCmd->AvailableForStates(G4State_PreInit);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -64,6 +92,10 @@ PhysicsListMessenger::~PhysicsListMessenger()
   delete fPhysDir;
   delete fCutsCmd;
   delete fListCmd;
+  delete fPixeCmd;
+  delete fFluorescenceCmd;
+  delete fAugerCmd;
+  delete fAugerCascadeCmd;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -76,6 +108,18 @@ void PhysicsListMessenger::SetNewValue(G4UIcommand *command,
   }
   else if (command == fListCmd) {
     fPhysicsList->SelectPhysicsList(newValue);
+  }
+  else if (command == fPixeCmd) {
+    fPhysicsList->SetPIXE(fPixeCmd->GetNewBoolValue(newValue));
+  }
+  else if (command == fFluorescenceCmd) {
+    fPhysicsList->SetFluorescence(fFluorescenceCmd->GetNewBoolValue(newValue));
+  }
+  else if (command == fAugerCmd) {
+    fPhysicsList->SetAuger(fAugerCmd->GetNewBoolValue(newValue));
+  }
+  else if (command == fAugerCascadeCmd) {
+    fPhysicsList->SetAugerCascade(fAugerCascadeCmd->GetNewBoolValue(newValue));
   }
 }
 

@@ -1,0 +1,24 @@
+# Short H-100 run for validating a Geant4 installation and ROOT output.
+
+/run/numberOfThreads 4
+
+/XRtube/det/setTargetMaterial G4_W
+/XRtube/det/setAnodeAngle 15 deg
+/XRtube/det/setInherentFilterMaterial G4_Al
+/XRtube/det/setInherentFilterThickness 4 mm
+/XRtube/det/setFilterMaterial G4_Cu
+/XRtube/det/setFilterThickness 0.15 mm
+
+/phys/SelectPhysicsList standard_option4
+/phys/setCuts 5. um
+/run/initialize
+
+/process/em/setSecBiasing eBrem world 200 1000 keV
+
+/control/verbose 1
+/run/verbose 1
+/xraytube/setEnergy 100 keV
+/run/initialize
+
+/random/setSeeds 1234567 7654321
+/run/beamOn 100000

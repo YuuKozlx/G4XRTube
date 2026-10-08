@@ -4,6 +4,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4LossTableManager.hh"
 #include "G4UAtomicDeexcitation.hh"
+#include "G4EmParameters.hh"
 
 // EM physics lists
 #include "G4EmStandardPhysics.hh"
@@ -17,6 +18,10 @@ PhysicsList::PhysicsList()
   : G4VUserPhysicsList(),
     fParticleList(nullptr),
     fEmPhysicsList(nullptr),
+    fPIXE(false),
+    fFluorescence(true),
+    fAuger(true),
+    fAugerCascade(true),
     fPMessenger(nullptr)
 {
   defaultCutValue = 1.0 * um;
@@ -42,6 +47,11 @@ void PhysicsList::ConstructParticle()
 
 void PhysicsList::ConstructProcess()
 {
+  auto* emParameters = G4EmParameters::Instance();
+  emParameters->SetFluo(fFluorescence);
+  emParameters->SetAuger(fAuger || fAugerCascade);
+  emParameters->SetPixe(fPIXE);
+
   AddTransportation();
 
   if (fParticleList) {
@@ -53,10 +63,10 @@ void PhysicsList::ConstructProcess()
   }
 
   auto* de = new G4UAtomicDeexcitation();
-  de->SetFluo(true);
-  de->SetAuger(true);
-  de->SetAugerCascade(true);
-  de->SetPIXE(true);
+  de->SetFluo(fFluorescence);
+  de->SetAuger(fAuger);
+  de->SetAugerCascade(fAugerCascade);
+  de->SetPIXE(fPIXE);
   G4LossTableManager::Instance()->SetAtomDeexcitation(de);
 }
 
@@ -108,4 +118,24 @@ void PhysicsList::SetCuts()
 void PhysicsList::SetDefaultCutsValue(G4double value)
 {
   defaultCutValue = value;
+}
+
+void PhysicsList::SetPIXE(G4bool value)
+{
+  fPIXE = value;
+}
+
+void PhysicsList::SetFluorescence(G4bool value)
+{
+  fFluorescence = value;
+}
+
+void PhysicsList::SetAuger(G4bool value)
+{
+  fAuger = value;
+}
+
+void PhysicsList::SetAugerCascade(G4bool value)
+{
+  fAugerCascade = value;
 }

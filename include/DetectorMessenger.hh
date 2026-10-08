@@ -62,6 +62,9 @@ private:
   G4UIcmdWithADoubleAndUnit *fFilterThicknessCmd;
   G4UIcmdWithAString *fInherentFilterMatCmd;
   G4UIcmdWithADoubleAndUnit *fInherentFilterThicknessCmd;
+  G4UIcmdWithADoubleAndUnit *fScoringDistanceCmd;
+  G4UIcmdWithADoubleAndUnit *fScoringOffsetXCmd;
+  G4UIcmdWithADoubleAndUnit *fScoringOffsetYCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

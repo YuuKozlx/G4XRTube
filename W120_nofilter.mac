@@ -1,0 +1,33 @@
+# Reproducible W-target 120 kVp spectrum with no filtration.
+
+/run/numberOfThreads 8
+
+# Geometry
+/XRtube/det/setTargetMaterial G4_W
+/XRtube/det/setAnodeAngle 15 deg
+/XRtube/det/setScoringDistance 50 cm
+/XRtube/det/setScoringOffsetX 0 cm
+/XRtube/det/setScoringOffsetY 0 cm
+
+# No inherent or added filtration
+/XRtube/det/setInherentFilterMaterial G4_Galactic
+/XRtube/det/setInherentFilterThickness 1 um
+/XRtube/det/setFilterMaterial G4_Galactic
+/XRtube/det/setFilterThickness 1 um
+
+# Electromagnetic physics and production cut
+/phys/SelectPhysicsList standard_option4
+/phys/setCuts 5. um
+
+/run/initialize
+
+# Bremsstrahlung splitting
+/process/em/setSecBiasing eBrem world 200 1000 keV
+
+/control/verbose 1
+/run/verbose 1
+/xraytube/setEnergy 120 keV
+/run/initialize
+
+/random/setSeeds 1201201 7654321
+/run/beamOn 5000000

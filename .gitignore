@@ -1,6 +1,10 @@
 # Build directories
 /build/
 /cmake-build-*/
+/build-container/
+
+# Local tool environments and downloaded analysis dependencies
+/.tools/
 
 # CMake-generated files
 CMakeCache.txt

@@ -17,7 +17,11 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 #include "G4RunManager.hh"
+
+#include <algorithm>
+#include <cmath>
 
 DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction(),
@@ -25,6 +29,9 @@ DetectorConstruction::DetectorConstruction()
     fAnodeAngle(12.0 * deg),
     fFilterThickness(0.8 * mm),
     fInherentFilterThickness(1.0 * mm),
+    fScoringDistance(50.0 * cm),
+    fScoringOffsetX(0.0 * cm),
+    fScoringOffsetY(0.0 * cm),
     fInherentFilterMaterial(nullptr),
     fAnodeMaterial(nullptr),
     fFilterMaterial(nullptr),
@@ -73,7 +80,11 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   G4LogicalVolumeStore::GetInstance()->Clean();
   G4SolidStore::GetInstance()->Clean();
 
-  const G4double worldSizeXYZ = 500.0 * cm;
+  const G4double worldSizeXYZ = std::max({
+      500.0 * cm,
+      2.0 * (fScoringDistance + 1.0 * cm),
+      2.0 * (std::abs(fScoringOffsetX) + 13.0 * cm),
+      2.0 * (std::abs(fScoringOffsetY) + 13.0 * cm)});
 
   auto* solidWorld = new G4Box("World",
                                worldSizeXYZ / 2.0,
@@ -176,13 +187,20 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   detectorLV = new G4LogicalVolume(solidDetector, vacuum, "detector");
 
   new G4PVPlacement(nullptr,
-                    G4ThreeVector(0., 0., -50.0 * cm),
+                    G4ThreeVector(fScoringOffsetX,
+                                  fScoringOffsetY,
+                                  -fScoringDistance),
                     detectorLV,
                     "detector",
                     worldLV,
                     false,
                     0,
                     fCheckOverlaps);
+
+  G4cout << "Scoring plane center: ("
+         << G4BestUnit(fScoringOffsetX, "Length") << ", "
+         << G4BestUnit(fScoringOffsetY, "Length") << ", -"
+         << G4BestUnit(fScoringDistance, "Length") << ")" << G4endl;
 
   auto* blue = new G4VisAttributes(G4Colour(0., 0., 1., 0.1));
   blue->SetVisibility(true);
@@ -274,6 +292,24 @@ void DetectorConstruction::SetInherentFilterThickness(G4double value)
   G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
+void DetectorConstruction::SetScoringDistance(G4double value)
+{
+  fScoringDistance = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+void DetectorConstruction::SetScoringOffsetX(G4double value)
+{
+  fScoringOffsetX = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+void DetectorConstruction::SetScoringOffsetY(G4double value)
+{
+  fScoringOffsetY = value;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
 G4Material* DetectorConstruction::GetFilterMaterial() const
 {
   return fFilterMaterial;
@@ -302,6 +338,21 @@ G4Material* DetectorConstruction::GetInherentFilterMaterial() const
 G4double DetectorConstruction::GetInherentFilterThickness() const
 {
   return fInherentFilterThickness;
+}
+
+G4double DetectorConstruction::GetScoringDistance() const
+{
+  return fScoringDistance;
+}
+
+G4double DetectorConstruction::GetScoringOffsetX() const
+{
+  return fScoringOffsetX;
+}
+
+G4double DetectorConstruction::GetScoringOffsetY() const
+{
+  return fScoringOffsetY;
 }
 
 void DetectorConstruction::ConstructSDandField()

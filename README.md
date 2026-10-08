@@ -9,7 +9,7 @@ quality, and spatial beam distributions, including the anode heel effect.
 
 This repository contains the updated application used for the accompanying
 beam-quality and spatial-distribution study. The present release was prepared
-for Geant4 11.4.0.
+for Geant4 11.3.x.
 
 ## Main features
 
@@ -23,11 +23,43 @@ for Geant4 11.4.0.
 - ROOT histogram and ntuple output;
 - optional PyQt6 launcher for generating macros and starting simulations.
 
+Atomic de-excitation controls are exposed before `/run/initialize`:
+
+```text
+/phys/setFluorescence true
+/phys/setAuger true
+/phys/setAugerCascade true
+/phys/setPIXE false
+```
+
+The defaults are fluorescence on, Auger on, Auger cascade on, and PIXE off.
+Set `/phys/setPIXE true` explicitly when modeling particle-induced X-ray
+emission from charged-particle shell ionization.
+
+## Configurable spectrum scoring distance
+
+The circular spectrum scoring plane is 50 cm from the target by default. Set
+its target-to-plane distance before `/run/initialize` with:
+
+```text
+/XRtube/det/setScoringDistance 100 cm
+/XRtube/det/setScoringOffsetX 2 cm
+/XRtube/det/setScoringOffsetY -1 cm
+```
+
+Any positive Geant4 length and unit are accepted (for example `500 mm`,
+`100 cm`, or `1 m`). The world volume expands automatically when a distance
+or transverse offset exceeds its default extent. Offsets may be positive or
+negative and default to zero. The scoring plane remains parallel to XY, with
+its center at `(offsetX, offsetY, -distance)`. Each run scores photons at the
+configured physical plane; the result is not produced by post-processing an
+inverse-square scaling of a spectrum recorded at another distance.
+
 ## Requirements
 
 Required:
 
-- Geant4 11.4.0 with ROOT analysis support, multithreading, UI, and
+- Geant4 11.3.x with ROOT analysis support, multithreading, UI, and
   visualization enabled;
 - CMake 3.16 or newer;
 - a C++17 compiler.
@@ -136,6 +168,13 @@ The application adds the following commands:
 | `/XRtube/det/setFilterThickness` | Set added-filter thickness | `0.15 mm` |
 | `/phys/SelectPhysicsList` | Select the electromagnetic constructor | `standard_option4` |
 | `/phys/setCuts` | Set the common production range cut | `5 um` |
+| `/phys/setFluorescence` | Enable or disable fluorescence photons | `true` |
+| `/phys/setAuger` | Enable or disable Auger electrons | `true` |
+| `/phys/setAugerCascade` | Enable or disable the Auger cascade | `true` |
+| `/phys/setPIXE` | Enable or disable PIXE atomic de-excitation | `false` |
+| `/XRtube/det/setScoringDistance` | Set target-to-scoring-plane distance | `100 cm` |
+| `/XRtube/det/setScoringOffsetX` | Set scoring-plane X offset | `2 cm` |
+| `/XRtube/det/setScoringOffsetY` | Set scoring-plane Y offset | `-1 cm` |
 | `/xraytube/setEnergy` | Set the incident-electron energy | `100 keV` |
 
 Supported electromagnetic selections are `standard`, `standard_option4`,

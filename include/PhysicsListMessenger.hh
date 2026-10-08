@@ -39,6 +39,7 @@ class PhysicsList;
 class G4UIdirectory;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithAString;
+class G4UIcmdWithABool;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -57,6 +58,10 @@ private:
   G4UIdirectory* fPhysDir;
   G4UIcmdWithADoubleAndUnit* fCutsCmd;
   G4UIcmdWithAString* fListCmd;
+  G4UIcmdWithABool* fPixeCmd;
+  G4UIcmdWithABool* fFluorescenceCmd;
+  G4UIcmdWithABool* fAugerCmd;
+  G4UIcmdWithABool* fAugerCascadeCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
