@@ -95,18 +95,25 @@ void writeSpectrum(const std::string& stem, const SpectrumRun& spectrum,
         << "\" text-anchor=\"end\" font-size=\"11\">" << std::setprecision(3)
         << value << "</text>\n";
   }
-  svg << "<polyline fill=\"none\" stroke=\"#1769aa\" stroke-width=\"1.8\" points=\"";
-
   const G4double plotUsableWidth = plotWidth - left - right;
   const G4double plotUsableHeight = plotHeight - top - bottom;
+  svg << "<path fill=\"none\" stroke=\"#1769aa\" stroke-width=\"1.8\" d=\"";
   for (std::size_t bin = 0; bin < counts.size(); ++bin) {
     const G4double energyKeV = (bin + 1.0) * spectrum.GetBinWidth() / keV;
     const G4double fluence = counts[bin] * scale;
     spec << energyKeV << ' ' << fluence << '\n';
-    const G4double x = left + plotUsableWidth * energyKeV /
+    const G4double xLeft = left + plotUsableWidth * bin *
+        (spectrum.GetBinWidth() / keV) / (spectrum.GetMaximumEnergy() / keV);
+    const G4double xRight = left + plotUsableWidth * energyKeV /
         (spectrum.GetMaximumEnergy() / keV);
     const G4double y = top + plotUsableHeight * (1.0 - fluence / maximum);
-    svg << x << ',' << y << ' ';
+    if (bin == 0) {
+      svg << "M " << xLeft << ' ' << y << ' ';
+    }
+    else {
+      svg << "V " << y << ' ';
+    }
+    svg << "H " << xRight << ' ';
   }
   svg << "\"/>\n"
       << "<text x=\"" << (left + plotWidth - right) / 2 << "\" y=\"" << plotHeight - 20
